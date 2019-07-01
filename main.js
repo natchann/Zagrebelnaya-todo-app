@@ -1,16 +1,9 @@
-class toDoApp {
-    constructor (){
 
-    }
-    excute(){
-
-    }
-
-}
 
 class Task {
     constructor(title="Заголовок"){
         this.title + title;
+        this.isDone = false;
         
     }
     isDone(isDone){
@@ -23,14 +16,32 @@ class TaskManager{
 
     }
     add(){
-
+        
     }
     remove(){
-
+        
     }
 
 }
 
-class {
-    
+
+class Store{
+
 }
+
+class ToDoApp {
+    constructor (){
+
+    }
+    render(){
+        
+    }
+    excute(){
+        
+        
+        
+    }
+
+}
+
+
