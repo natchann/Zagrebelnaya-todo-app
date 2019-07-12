@@ -47,7 +47,7 @@ min-height: 100px;
 
 }
 
-.lineThrough{
+.done{
     text-decoration: line-through;
     color : #ccc;
 }

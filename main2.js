@@ -1,42 +1,61 @@
 class Render {
   constructor(
     taskContainer,
-    errorContainer,
-    deleteTaskFunction,
-    toggleTaskFunction
+    errorContainer
   ) {
     this._taskContainer = taskContainer;
     this._errorContainer = errorContainer;
+  }
 
-    this._deleteTaskFunction = deleteTaskFunction;
-    this._toggleTaskFunction = toggleTaskFunction;
+  set deleteTaskFunction(func) {
+    this._deleteTaskFunction = func;
+  }
+
+  set toggleTaskFunction(func) {
+    this._toggleTaskFunction = func;
   }
 
   renderTask(task) {
-    const input = 
-   `<input type = "checkbox" name = "check" value="check" ;>`
-    const item = `<li style="list-style-type: none; display: inline;">${task.title}</li>`
-    const button = `<button >done</button>`
-     
-    
-const position = "beforeend";
+    const taskElement = document.createElement('div');
+    taskElement.setAttribute('id', task.id);
 
-taskContainer.insertAdjacentHTML(position, input);
-taskContainer.insertAdjacentHTML(position, item);
-taskContainer.insertAdjacentHTML(position, button);
+    const textElement = document.createElement('span');
+    textElement.textContent = task.title;
 
-.addEventListener("click",function(even){
-  if(button == 0){
-      
+    const checkboxElement = document.createElement('input');
+    checkboxElement.setAttribute('type', 'checkbox');
+
+    checkboxElement.addEventListener('change', (event) => {
+      const id = event.currentTarget.parentNode.id;
+      this._toggleTaskFunction(id);
+    });
+
+    const buttonElement = document.createElement('input');
+    buttonElement.setAttribute('type', 'button');
+    buttonElement.setAttribute('value', 'Delete');
+
+    buttonElement.addEventListener('click', (event) => {
+      const id = event.currentTarget.parentNode.id;
+      this._deleteTaskFunction(id);
+    });
+
+    taskElement.appendChild(checkboxElement);
+    taskElement.appendChild(textElement);
+    taskElement.appendChild(buttonElement);
+
+    this._taskContainer.appendChild(taskElement);
   }
-} )
-  }
+
   updateTask(task) {
-
+    const taskElement = document.getElementById(task.id);
+    task.isDone
+      ? taskElement.classList.add('done')
+      : taskElement.classList.remove('done');
   }
 
   destroyTask(id) {
-
+    const taskElement = document.getElementById(id);
+    this._taskContainer.removeChild(taskElement);
   }
 
   displayError(error) {
@@ -66,13 +85,13 @@ class Store {
       if (!task) {
         reject(new Error(`task with id = ${id} does not exists`));
       }
-      this._storage = this._storage.filter(task => task.id === id);
+      this._storage = this._storage.filter(task => task.id !== id);
       resolve({});
     });
   }
 
   updateTask(updatedTask) {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const task = this._storage.find((task) => task.id === updatedTask.id);
       if (!task) {
         reject(new Error(`task with id = ${updatedTask.id} does not exists`));
@@ -84,7 +103,10 @@ class Store {
   }
 
   getTask(id) {
-    return this._id;
+    return new Promise((resolve) => {
+      const task = this._storage.find(task => task.id === id);
+      resolve(task);
+    })
   }
 
   getTasks() {
@@ -184,6 +206,10 @@ class Task {
     this._isDone = isDone;
   }
 
+  get id() {
+    return this._id;
+  }
+
   get title() {
     return this._title;
   }
@@ -231,7 +257,7 @@ class TODO {
     this._taskManager = taskManager;
     this._render = render;
   }
- 
+
   addTask(title) {
     this._taskManager.createTask(title)
       .then(task => {
@@ -253,6 +279,7 @@ class TODO {
   }
 
   toggleTask(id) {
+    debugger
     this._taskManager.toggleTask(id)
       .then(task => {
         this._render.updateTask(task);
@@ -272,37 +299,24 @@ class TODOApp {
 
   execute() {
 
-   
+
     const store = new Store();
     const taskManager = new TaskManager(store);
 
-   
+
 
     const taskContainerRef = document.getElementById("content");
     const errorContainerRef = document.getElementById("error");;
-    
-
-    let deleteTaskFunctionStub = () => {
-      throw new Error('not implemented')
-    };
-
-    let toggleTaskFunctionStub = () => {
-      throw new Error('not implemented')
-    };
 
     const render = new Render(
       taskContainerRef,
-      errorContainerRef,
-      deleteTaskFunctionStub,
-      toggleTaskFunctionStub
+      errorContainerRef
     );
 
     this._todo = new TODO(taskManager, render);
 
-    deleteTaskFunctionStub = this._todo.deleteTask.bind(this._todo);
-    toggleTaskFunctionStub = this._todo.toggleTask.bind(this._todo);
-
-  
+    render.deleteTaskFunction = this._todo.deleteTask.bind(this._todo);
+    render.toggleTaskFunction = this._todo.toggleTask.bind(this._todo);
 
     this._addTaskButtonRef = document.getElementById("submit");
     this._titleInputRef = document.getElementById("input");
