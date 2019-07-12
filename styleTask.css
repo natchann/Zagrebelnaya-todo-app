@@ -1,0 +1,53 @@
+body {
+    
+}
+
+.container {
+    width: 300px;
+   
+    margin: 0 auto;
+}
+
+.header {
+    margin-top: 20px;
+    height: 200px;
+    background: url(../Zagrebelnaya-todo-app/bg2.jpg);
+    border-radius: 10px;
+}
+
+.cont {
+min-height: 100px;
+
+}
+
+.size {
+    width: 200px;
+    border-radius: 7px;
+    padding: 10px;
+    
+    
+}
+
+.size:hover {
+    background: rgba(120, 185, 245, 0.116);
+    
+}
+
+.bot-size {
+    width: 70px;
+    padding: 9px;
+    border-radius: 5px;
+    background: linear-gradient(to bottom, rgba(2, 68, 131, 0.8), rgba(94, 199, 240, 0.438) 70.71%);
+    border: none;
+    text-align: center;
+}
+
+.bot-size:hover{
+    background: rgba(2, 68, 131, 0.8);
+
+}
+
+.lineThrough{
+    text-decoration: line-through;
+    color : #ccc;
+}
