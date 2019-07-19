@@ -25,19 +25,28 @@ class Render {
     const checkboxElement = document.createElement('input');
     checkboxElement.setAttribute('type', 'checkbox');
 
-    checkboxElement.addEventListener('change', (event) => {
-      const id = event.currentTarget.parentNode.id;
+    const toggleFunc = (function(event){
+      const id= event.currentTarget.parentNode.id;
       this._toggleTaskFunction(id);
-    });
+    }).bind(this);
+
+    this._events[`${task.id}_toggle`]= toggleFunc;
+
+    checkboxElement.addEventListener('change', toggleFunc);
 
     const buttonElement = document.createElement('input');
     buttonElement.setAttribute('type', 'button');
     buttonElement.setAttribute('value', 'Delete');
 
-    buttonElement.addEventListener('click', (event) => {
+    const deleteFunc = (function(event){
       const id = event.currentTarget.parentNode.id;
       this._deleteTaskFunction(id);
-    });
+    }).bind(this);
+
+    this._events[`${task.id}_delete`] = deleteFunc;
+    
+    buttonElement.addEventListener('click', deleteFunc);
+     
 
     taskElement.appendChild(checkboxElement);
     taskElement.appendChild(textElement);
@@ -56,8 +65,20 @@ class Render {
   destroyTask(id) {
     const taskElement = document.getElementById(id);
     this._taskContainer.removeChild(taskElement);
-  }
 
+    for (const eventKey in this._events){
+      if (
+        eventKey === `${id}_toggle`
+        ||
+        eventKey === `${id}_delete`
+      ){
+        const event = this._events[eventKey];
+        taskElement.removeEventListener(event);
+      }
+    }
+  this._taskContainer.removeChild(taskElement);
+  }
+  
   displayError(error) {
 
   }
