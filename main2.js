@@ -1,10 +1,12 @@
 class Render {
+  debugger
   constructor(
     taskContainer,
     errorContainer
   ) {
     this._taskContainer = taskContainer;
     this._errorContainer = errorContainer;
+    this._events = {};
   }
 
   set deleteTaskFunction(func) {
@@ -18,12 +20,15 @@ class Render {
   renderTask(task) {
     const taskElement = document.createElement('div');
     taskElement.setAttribute('id', task.id);
+    taskElement.classList.add('taskElemStyle')
 
     const textElement = document.createElement('span');
     textElement.textContent = task.title;
 
     const checkboxElement = document.createElement('input');
     checkboxElement.setAttribute('type', 'checkbox');
+    checkboxElement.checked = task.isDone;
+    
 
     const toggleFunc = (function(event){
       const id= event.currentTarget.parentNode.id;
@@ -37,6 +42,7 @@ class Render {
     const buttonElement = document.createElement('input');
     buttonElement.setAttribute('type', 'button');
     buttonElement.setAttribute('value', 'Delete');
+    buttonElement.setAttribute('class', 'Delete');
 
     const deleteFunc = (function(event){
       const id = event.currentTarget.parentNode.id;
@@ -51,6 +57,10 @@ class Render {
     taskElement.appendChild(checkboxElement);
     taskElement.appendChild(textElement);
     taskElement.appendChild(buttonElement);
+
+    if(task.isDone){
+      taskElement.classList.add('done')
+    }
 
     this._taskContainer.appendChild(taskElement);
   }
@@ -78,7 +88,7 @@ class Render {
     }
   this._taskContainer.removeChild(taskElement);
   }
-  
+
   displayError(error) {
 
   }
@@ -88,86 +98,107 @@ class Render {
   }
 }
 
-class Store {
-  constructor() {
-    this._storage = [];
-  }
+// class Store {
+//   constructor() {
+//     this._storage = [];
+//   }
+
+  // saveTask(task) {
+  //   return new Promise((resolve) => {
+  //     this._storage.push(task);
+  //     resolve(task);
+  //   });
+  // }
+
+  // deleteTask(id) {
+  //   return new Promise((resolve, reject) => {
+  //     const task = this._storage.find((task) => task.id === id);
+  //     if (!task) {
+  //       reject(new Error(`task with id = ${id} does not exists`));
+  //     }
+  //     this._storage = this._storage.filter(task => task.id !== id);
+  //     resolve({});
+  //   });
+  // }
+
+  // updateTask(updatedTask) {
+  //   return new Promise(async (resolve, reject) => {
+  //     const task = this._storage.find((task) => task.id === updatedTask.id);
+  //     if (!task) {
+  //       reject(new Error(`task with id = ${updatedTask.id} does not exists`));
+  //     }
+  //     await this.deleteTask(task.id);
+  //     const savedUpdatedTask = await this.saveTask(updatedTask);
+//       resolve(savedUpdatedTask);
+//     });
+//   }
+
+//   getTask(id) {
+//     return new Promise((resolve) => {
+//       const task = this._storage.find(task => task.id === id);
+//       resolve(task);
+//     })
+//   }
+
+//   getTasks() {
+//     return this._task;
+//   }
+// }
+
+class StoreLS {
+  constructor() { }
 
   saveTask(task) {
     return new Promise((resolve) => {
-      this._storage.push(task);
+      const json = JSON.stringify(task);
+      localStorage.setItem(task.id, json)
       resolve(task);
     });
   }
 
   deleteTask(id) {
     return new Promise((resolve, reject) => {
-      const task = this._storage.find((task) => task.id === id);
+      const task = localStorage.getItem(id);
       if (!task) {
         reject(new Error(`task with id = ${id} does not exists`));
       }
-      this._storage = this._storage.filter(task => task.id !== id);
+      localStorage.removeItem(id);
       resolve({});
     });
   }
 
-  updateTask(updatedTask) {
-    return new Promise(async (resolve, reject) => {
-      const task = this._storage.find((task) => task.id === updatedTask.id);
-      if (!task) {
-        reject(new Error(`task with id = ${updatedTask.id} does not exists`));
-      }
-      await this.deleteTask(task.id);
-      const savedUpdatedTask = await this.saveTask(updatedTask);
-      resolve(savedUpdatedTask);
-    });
+ async updateTask(task) {
+  const oldTask = await this.getTask(task.id);
+  await deleteTask(oldTask);
+
+  return this.saveTask(task);
+
   }
 
   getTask(id) {
-    return new Promise((resolve) => {
-      const task = this._storage.find(task => task.id === id);
-      resolve(task);
+    return new Promise( async (resolve, reject) => {
+      const tasks = await this.getTasks();
+      const task = tasks.find(task => task.id === id);
+      if (task){
+        resolve(task);
+      }
+      reject (new Error('Some Error'))
     })
   }
 
   getTasks() {
-    return this._task;
+  return new Promise(resolve => {
+    const tasks = [];
+    for (let index = 0;index< localStorage.length; index++){
+      const key = localStorage.key(index);
+      const json = JSON.parse(localStorage.getItem(key));
+      const task = Task.fromJSON(json);
+      tasks.push(task);
+    }
+    resolve(tasks);
+  })
   }
 }
-
-// class StoreLS {
-//   constructor() { }
-
-//   saveTask(task) {
-//     return new Promise((resolve) => {
-//       const json = JSON.stringify(task);
-//       localStorage.setItem(task.id, json)
-//       resolve(task);
-//     });
-//   }
-
-//   deleteTask(id) {
-//     return new Promise((resolve, reject) => {
-//       const task = localStorage.getItem(id);
-//       if (!task) {
-//         reject(new Error(`task with id = ${id} does not exists`));
-//       }
-//       localStorage.removeItem(id);
-//       resolve({});
-//     });
-//   }
-
-//   updateTask(task) {
-
-//   }
-
-//   getTask(id) {
-
-//   }
-
-//   getTasks() {
-//   }
-// }
 
 // class StoreJS {
 //   constructor() {
@@ -242,6 +273,11 @@ class Task {
   toggle() {
     this._isDone = !this._isDone;
   }
+
+  static fromJSON(json){
+    const task = new Task(json._id, json._title, json._isDone);
+    return task;
+  }
 }
 
 class TaskManager {
@@ -251,6 +287,10 @@ class TaskManager {
       const uniqueId = Math.random().toString(36).substr(2, 16);
       return uniqueId;
     }
+  }
+
+  getTasks(){
+    return this._store.getTasks();
   }
 
   createTask(title) {
@@ -279,6 +319,13 @@ class TODO {
     this._render = render;
   }
 
+  async init(){
+    const tasks = await this._taskManager.getTasks();
+    for(const task of tasks){
+      this._render.renderTask(task);
+    }
+  }
+
   addTask(title) {
     this._taskManager.createTask(title)
       .then(task => {
@@ -300,7 +347,7 @@ class TODO {
   }
 
   toggleTask(id) {
-    debugger
+    
     this._taskManager.toggleTask(id)
       .then(task => {
         this._render.updateTask(task);
@@ -321,7 +368,7 @@ class TODOApp {
   execute() {
 
 
-    const store = new Store();
+    const store = new StoreLS();
     const taskManager = new TaskManager(store);
 
 
@@ -351,6 +398,8 @@ class TODOApp {
     this._addTaskButtonOnClickBind = addTaskButtonOnClick.bind(this);
 
     this._addTaskButtonRef.addEventListener('click', this._addTaskButtonOnClickBind);
+
+    this._todo.init();
   }
 
   destroy() {
