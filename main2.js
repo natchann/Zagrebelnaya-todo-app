@@ -1,6 +1,5 @@
 class Render {
-  debugger
-  constructor(
+    constructor(
     taskContainer,
     errorContainer
   ) {
@@ -43,6 +42,7 @@ class Render {
     buttonElement.setAttribute('type', 'button');
     buttonElement.setAttribute('value', 'Delete');
     buttonElement.setAttribute('class', 'Delete');
+    buttonElement.setAttribute('class', 'cont-size-bot ')
 
     const deleteFunc = (function(event){
       const id = event.currentTarget.parentNode.id;

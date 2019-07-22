@@ -1,33 +1,71 @@
 
 
 .container {
-    width: 300px;
-   
+    height: 400px;
+    width: 500px;
+    background: rgba(2, 68, 131, 0.8) url(../Zagrebelnaya-todo-app/bg2.jpg);
     margin: 0 auto;
+    border-radius: 10px;
 }
 
 .header {
+    color: aliceblue;
+    font-style: italic;
+    font-weight: 800;
     margin-top: 20px;
-    height: 200px;
-    background: url(../Zagrebelnaya-todo-app/bg2.jpg);
+    padding: 20px 15px 5px; 
+    height: 70px;
+    text-align: center;
+    
+    
+}
+
+.main {
+    background-color: rgba(104, 178, 248, 0.4);
+    height: 270px;
+    width: 400px;
+    margin: 0 auto;
     border-radius: 10px;
+    padding-bottom: 15px;
+    position: relative;
+  
 }
 
 .cont {
 min-height: 100px;
+width: 300px;
+font-size: 24px;
+color: aliceblue;
+padding: 7px;
 
+ }
+ .cont-size-bot {
+    width: 50px;
+    border-radius: 5px;
+    padding: 3px;  
+    margin-left: 7px; 
+    background: linear-gradient(to bottom, rgba(7, 128, 241, 0.8), rgba(230, 242, 247, 0.7) 70.71%);
+    border: none;
+}
+.cont-size-bot:active{
+    background: rgba(147, 104, 248, 0.521);
 }
 
+
+.add-to-do{
+    position: absolute; 
+    bottom: 5px;
+    left: 20px;
+}
 .size {
     width: 200px;
     border-radius: 7px;
-    padding: 10px;
-    
+    padding: 10px;   
     
 }
 
 .size:hover {
-    background: rgba(120, 185, 245, 0.116);
+    background: rgba(177, 213, 247, 0.719);
     
 }
 
@@ -43,6 +81,10 @@ min-height: 100px;
 .bot-size:hover{
     background: rgba(2, 68, 131, 0.8);
 
+}
+
+.bot-size:active{
+    background: rgba(147, 104, 248, 0.521);
 }
 
 .done{
